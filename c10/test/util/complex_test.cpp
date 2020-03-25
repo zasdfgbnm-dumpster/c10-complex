@@ -215,6 +215,41 @@ void test_complex_literals() {
 
 } // namespace literals
 
+namespace real_imag {
+
+template<typename scalar_t>
+constexpr c10::complex<scalar_t> zero_one() {
+  c10::complex<scalar_t> result;
+  result.imag(scalar_t(1));
+  return result;
+}
+
+template<typename scalar_t>
+constexpr c10::complex<scalar_t> one_zero() {
+  c10::complex<scalar_t> result;
+  result.real(scalar_t(1));
+  return result;
+}
+
+void test_real_imag_modify() {
+  static_assert(zero_one<c10::Half>().real() == c10::Half(0));
+  static_assert(zero_one<c10::Half>().imag() == c10::Half(1));
+  static_assert(zero_one<float>().real() == float(0));
+  static_assert(zero_one<float>().imag() == float(1));
+  static_assert(zero_one<double>().real() == double(0));
+  static_assert(zero_one<double>().imag() == double(1));
+
+  static_assert(one_zero<c10::Half>().real() == c10::Half(1));
+  static_assert(one_zero<c10::Half>().imag() == c10::Half(0));
+  static_assert(one_zero<float>().real() == float(1));
+  static_assert(one_zero<float>().imag() == float(0));
+  static_assert(one_zero<double>().real() == double(1));
+  static_assert(one_zero<double>().imag() == double(0));
+}
+
+} // namespace real_imag
+
+
 TEST(NonStaticTests, all) {
   constructors::test_thrust_conversion();
   assignment::test_assign_thrust();
