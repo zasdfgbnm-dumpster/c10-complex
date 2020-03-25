@@ -79,9 +79,10 @@ struct alignas(sizeof(T) * 2) complex_common {
 #endif
 
   constexpr complex<T> &operator =(T re) {
-    T[0] = re;
+    storage[0] = re;
     return reinterpret_cast<complex<T> &>(*this);
   }
+
   template<typename U>
   constexpr complex<T> &operator =(const complex<U> &rhs) {
     storage[0] = rhs.real();
