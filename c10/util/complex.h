@@ -71,8 +71,6 @@ using Half = short;  // Just for the convenience of prototyping
 template<typename T>
 struct complex;
 
-namespace {
-
 template<typename T>
 struct alignas(sizeof(T) * 2) complex_common {
   T storage[2];
@@ -110,8 +108,6 @@ struct alignas(sizeof(T) * 2) complex_common {
     storage[1] = value;
   }
 };
-
-}
 
 template<>
 struct alignas(4) complex<c10::Half>: public complex_common<c10::Half> {
