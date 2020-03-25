@@ -53,6 +53,8 @@ using Half = short;  // Just for the convenience of prototyping
 //   - There is no specialization of converting assignemnt operators, which type is
 //     convertible is soly depend on whether the scalar type is convertable
 //
+// In addition to the standard assignment, we also provide assignment operators with std and thrust
+//
 //
 // [Operator""]
 //
@@ -95,6 +97,22 @@ struct alignas(sizeof(T) * 2) complex_common {
     storage[1] = rhs.imag();
     return reinterpret_cast<complex<T> &>(*this);
   }
+
+  template<typename U>
+  constexpr complex<T> &operator =(const std::complex<U> &rhs) {
+    storage[0] = rhs.real();
+    storage[1] = rhs.imag();
+    return reinterpret_cast<complex<T> &>(*this);
+  }
+
+#if defined(__CUDACC__) || defined(__HIPCC__)
+  template<typename U>
+  complex<T> &operator =(const thrust::complex<U> &rhs) {
+    storage[0] = rhs.real();
+    storage[1] = rhs.imag();
+    return reinterpret_cast<complex<T> &>(*this);
+  }
+#endif
 
   constexpr T real() const {
     return storage[0];

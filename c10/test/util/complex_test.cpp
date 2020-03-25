@@ -1,5 +1,6 @@
 #include <c10/util/complex.h>
 #include <type_traits>
+#include <tuple>
 
 // gtest mock
 #include <cassert>
@@ -118,18 +119,108 @@ void test_thrust_conversion() {
 
 namespace assignment {
 
+template<typename scalar_t>
+constexpr c10::complex<scalar_t> one() {
+  c10::complex<scalar_t> result;
+  result = scalar_t(1);
+  return result;
+}
 
+void test_assign_real() {
+  static_assert(one<c10::Half>().real() == c10::Half(1), "");
+  static_assert(one<c10::Half>().imag() == c10::Half(), "");
+  static_assert(one<float>().real() == float(1), "");
+  static_assert(one<float>().imag() == float(), "");
+  static_assert(one<double>().real() == double(1), "");
+  static_assert(one<double>().imag() == double(), "");
+}
+
+constexpr std::tuple<c10::complex<double>, c10::complex<float>, c10::complex<c10::Half>> ones() {
+  constexpr c10::complex<c10::Half> src(1, 1);
+  c10::complex<double> ret0;
+  c10::complex<float> ret1;
+  c10::complex<c10::Half> ret2;
+  ret0 = ret1 = ret2 = src;
+  return std::make_tuple(ret0, ret1, ret2);
+}
+
+void test_assign_other() {
+  constexpr auto tup = ones();
+  static_assert(std::get<c10::complex<double>>(tup).real() == double(1), "");
+  static_assert(std::get<c10::complex<double>>(tup).imag() == double(1), "");
+  static_assert(std::get<c10::complex<float>>(tup).real() == float(1), "");
+  static_assert(std::get<c10::complex<float>>(tup).imag() == float(1), "");
+  static_assert(std::get<c10::complex<c10::Half>>(tup).real() == c10::Half(1), "");
+  static_assert(std::get<c10::complex<c10::Half>>(tup).imag() == c10::Half(1), "");
+}
+
+constexpr std::tuple<c10::complex<double>, c10::complex<float>, c10::complex<c10::Half>> ones_std() {
+  constexpr std::complex<c10::Half> src(1, 1);
+  c10::complex<double> ret0;
+  c10::complex<float> ret1;
+  c10::complex<c10::Half> ret2;
+  ret0 = ret1 = ret2 = src;
+  return std::make_tuple(ret0, ret1, ret2);
+}
+
+void test_assign_std() {
+  constexpr auto tup = ones_std();
+  static_assert(std::get<c10::complex<double>>(tup).real() == double(1), "");
+  static_assert(std::get<c10::complex<double>>(tup).imag() == double(1), "");
+  static_assert(std::get<c10::complex<float>>(tup).real() == float(1), "");
+  static_assert(std::get<c10::complex<float>>(tup).imag() == float(1), "");
+  static_assert(std::get<c10::complex<c10::Half>>(tup).real() == c10::Half(1), "");
+  static_assert(std::get<c10::complex<c10::Half>>(tup).imag() == c10::Half(1), "");
+}
+
+#if defined(__CUDACC__) || defined(__HIPCC__)
+std::tuple<c10::complex<double>, c10::complex<float>, c10::complex<c10::Half>> ones_thrust() {
+  thrust::complex<c10::Half> src(1, 1);
+  c10::complex<double> ret0;
+  c10::complex<float> ret1;
+  c10::complex<c10::Half> ret2;
+  ret0 = ret1 = ret2 = src;
+  return std::make_tuple(ret0, ret1, ret2);
+}
+#endif
+
+void test_assign_thrust() {
+#if defined(__CUDACC__) || defined(__HIPCC__)
+  auto tup = ones_thrust();
+  ASSERT_EQ(std::get<c10::complex<double>>(tup).real(), double(1));
+  ASSERT_EQ(std::get<c10::complex<double>>(tup).imag(), double(1));
+  ASSERT_EQ(std::get<c10::complex<float>>(tup).real(), float(1));
+  ASSERT_EQ(std::get<c10::complex<float>>(tup).imag(), float(1));
+  ASSERT_EQ(std::get<c10::complex<c10::Half>>(tup).real(), c10::Half(1));
+  ASSERT_EQ(std::get<c10::complex<c10::Half>>(tup).imag(), c10::Half(1));
+#endif
+}
 
 } // namespace assignment
 
+namespace literals {
+
+void test_complex_literals() {
+  using namespace c10::complex_literals;
+  static_assert(std::is_same<decltype(0.5_ih), c10::complex<c10::Half>>::value, "");
+  static_assert((0.5_ih).real() == c10::Half(), "");
+  static_assert((0.5_ih).imag() == c10::Half(0.5), "");
+  static_assert(std::is_same<decltype(0.5_if), c10::complex<float>>::value, "");
+  static_assert((0.5_if).real() == float(), "");
+  static_assert((0.5_if).imag() == float(0.5), "");
+  static_assert(std::is_same<decltype(0.5_id), c10::complex<double>>::value, "");
+  static_assert((0.5_id).real() == float(), "");
+  static_assert((0.5_id).imag() == float(0.5), "");
+}
+
+} // namespace literals
 
 TEST(NonStaticTests, all) {
   constructors::test_thrust_conversion();
+  assignment::test_assign_thrust();
 }
 
-
-// Main
-
+// main
 int main() {
   NonStaticTests_all();
 }
