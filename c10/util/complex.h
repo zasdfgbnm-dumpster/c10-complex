@@ -60,6 +60,13 @@ using Half = short;  // Just for the convenience of prototyping
 // We define our own custom literals in the namespace `c10::complex_literals`. Our custom literals does not
 // follow the same behavior as in std::complex, instead, we define _ih, _if, _id to construct half/float/double
 // complex literals.
+//
+//
+// [real() and imag()]
+//
+// In C++20, there are two overload of these functions, one it to return the real/imag, another is to set real/imag,
+// they are both constexpr. We follow this design.
+//
 
 template<typename T>
 struct complex;
@@ -93,8 +100,14 @@ struct alignas(sizeof(T) * 2) complex_common {
   constexpr T real() const {
     return storage[0];
   }
+  constexpr void real(T value) {
+    storage[0] = value;
+  }
   constexpr T imag() const {
     return storage[1];
+  }
+  constexpr void imag(T value) const {
+    storage[1] = value;
   }
 };
 
