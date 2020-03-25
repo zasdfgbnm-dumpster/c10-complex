@@ -75,7 +75,8 @@ template<typename T>
 struct alignas(sizeof(T) * 2) complex_common {
   T storage[2];
 
-  constexpr complex_common(const T& re = T(), const T& im = T()): storage{re, im} {}
+  constexpr complex_common(): storage{T(), T()} {}
+  constexpr complex_common(const T& re, const T& im = T()): storage{re, im} {}
   template<typename U>
   constexpr complex_common(const std::complex<U> &other): complex_common(other.real(), other.imag()) {}
 #if defined(__CUDACC__) || defined(__HIPCC__)

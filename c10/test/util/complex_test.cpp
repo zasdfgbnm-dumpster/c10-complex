@@ -2,6 +2,7 @@
 #include <type_traits>
 
 // gtest mock
+#include <cassert>
 #define ASSERT_EQ(a, b) assert(a == b)
 #define TEST(a, b) void a##_##b()
 
