@@ -1,6 +1,6 @@
 #include <complex>
 #if defined(__CUDACC__) || defined(__HIPCC__)
-#include <thrust/thrust.h>
+#include <thrust/complex.h>
 #endif
 
 namespace c10 {
