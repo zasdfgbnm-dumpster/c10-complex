@@ -116,22 +116,22 @@ struct alignas(sizeof(T) * 2) complex_common {
 template<>
 struct alignas(4) complex<c10::Half>: public complex_common<c10::Half> {
   using complex_common<c10::Half>::complex_common;
-  explicit constexpr complex(const complex<float> &other): complex_common(static_cast<c10::Half>(other.real()), static_cast<c10::Half>(other.imag())) {}
-  explicit constexpr complex(const complex<double> &other): complex_common(static_cast<c10::Half>(other.real()), static_cast<c10::Half>(other.imag())) {}
+  explicit constexpr complex(const complex<float> &other): complex_common(static_cast<c10::Half>(reinterpret_cast<const float *>(&other)[0]), static_cast<c10::Half>(reinterpret_cast<const float *>(&other)[1])) {}
+  explicit constexpr complex(const complex<double> &other): complex_common(static_cast<c10::Half>(reinterpret_cast<const double *>(&other)[0]), static_cast<c10::Half>(reinterpret_cast<const double *>(&other)[1])) {}
 };
 
 template<>
 struct alignas(8) complex<float>: public complex_common<float> {
   using complex_common<float>::complex_common;
-  constexpr complex(const complex<c10::Half> &other): complex_common(other.real(), other.imag()) {}
-  explicit constexpr complex(const complex<double> &other): complex_common(static_cast<c10::Half>(other.real()), static_cast<c10::Half>(other.imag())) {}
+  constexpr complex(const complex<c10::Half> &other): complex_common(reinterpret_cast<const c10::Half *>(&other)[0], reinterpret_cast<const c10::Half *>(&other)[1]) {}
+  explicit constexpr complex(const complex<double> &other): complex_common(static_cast<float>(reinterpret_cast<const double *>(&other)[0]), static_cast<float>(reinterpret_cast<const double *>(&other)[1])) {}
 };
 
 template<>
 struct alignas(16) complex<double>: public complex_common<double> {
   using complex_common<double>::complex_common;
-  constexpr complex(const complex<c10::Half> &other): complex_common(other.real(), other.imag()) {}
-  constexpr complex(const complex<float> &other): complex_common(other.real(), other.imag()) {}
+  constexpr complex(const complex<c10::Half> &other): complex_common(reinterpret_cast<const c10::Half *>(&other)[0], reinterpret_cast<const c10::Half *>(&other)[1]) {}
+  constexpr complex(const complex<float> &other): complex_common(reinterpret_cast<const float *>(&other)[0], reinterpret_cast<const float *>(&other)[1]) {}
 };
 
 namespace complex_literals {
