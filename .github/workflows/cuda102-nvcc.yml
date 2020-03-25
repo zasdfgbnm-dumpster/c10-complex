@@ -1,4 +1,4 @@
-name: CPU-GCC
+name: CUDA10.2-NVCC
 
 on:
   push:
