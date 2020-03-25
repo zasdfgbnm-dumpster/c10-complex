@@ -1,8 +1,15 @@
 #include <c10/util/complex.h>
 
-// test memory:
-// sizeof
-// alignof
+void test_size () {
+  static_assert(sizeof(c10::complex<c10::Half>) == 4);
+  static_assert(sizeof(c10::complex<float>) == 8);
+  static_assert(sizeof(c10::complex<double>) == 16);
+}
 
-// test constructor:
-// static cast
+void test_align () {
+  static_assert(alignof(c10::complex<c10::Half>) == 4);
+  static_assert(alignof(c10::complex<float>) == 8);
+  static_assert(alignof(c10::complex<double>) == 16);
+}
+
+int main() {}

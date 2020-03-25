@@ -62,9 +62,7 @@ using Half = short;  // Just for the convenience of prototyping
 // complex literals.
 
 template<typename T>
-struct complex {
-  static_assert(false, "c10::complex only support c10::Half, float, double as scalar type");
-};
+struct complex;
 
 namespace {
 
