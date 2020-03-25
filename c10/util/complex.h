@@ -123,7 +123,7 @@ struct alignas(sizeof(T) * 2) complex_common {
   constexpr T imag() const {
     return storage[1];
   }
-  constexpr void imag(T value) const {
+  constexpr void imag(T value) {
     storage[1] = value;
   }
 };
