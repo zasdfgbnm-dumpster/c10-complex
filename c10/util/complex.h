@@ -80,7 +80,7 @@ struct alignas(sizeof(T) * 2) complex_common {
   constexpr complex_common(const std::complex<U> &other): complex_common(other.real(), other.imag()) {}
 #if defined(__CUDACC__) || defined(__HIPCC__)
   template<typename U>
-  constexpr complex_common(const thrust::complex<U> &other): complex_common(other.real(), other.imag()) {}
+  complex_common(const thrust::complex<U> &other): complex_common(other.real(), other.imag()) {}
 #endif
 
   constexpr complex<T> &operator =(T re) {

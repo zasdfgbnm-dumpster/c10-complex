@@ -1,6 +1,10 @@
 #include <c10/util/complex.h>
 #include <type_traits>
 
+// gtest mock
+#define ASSERT_EQ(a, b) assert(a == b)
+#define TEST(a, b) void a##_##b()
+
 namespace memory {
 
 void test_size() {
@@ -92,21 +96,22 @@ void test_std_conversion() {
 }
 
 #if defined(__CUDACC__) || defined(__HIPCC__)
-
 template<typename scalar_t>
 void test_construct_from_thrust() {
   constexpr scalar_t num1 = scalar_t(1.23);
   constexpr scalar_t num2 = scalar_t(4.56);
-  static_assert(c10::complex<scalar_t>(thrust::complex<scalar_t>(num1, num2)).real() == num1, "");
-  static_assert(c10::complex<scalar_t>(thrust::complex<scalar_t>(num1, num2)).imag() == num2, "");
+  ASSERT_EQ(c10::complex<scalar_t>(thrust::complex<scalar_t>(num1, num2)).real(), num1);
+  ASSERT_EQ(c10::complex<scalar_t>(thrust::complex<scalar_t>(num1, num2)).imag(), num2);
 }
+#endif
 
 void test_thrust_conversion() {
+#if defined(__CUDACC__) || defined(__HIPCC__)
   test_construct_from_thrust<float>();
   test_construct_from_thrust<double>();
+#endif
 }
 
-#endif
 
 }  // constructors
 
@@ -117,7 +122,13 @@ namespace assignment {
 } // namespace assignment
 
 
+TEST(NonStaticTests, all) {
+  constructors::test_thrust_conversion();
+}
+
 
 // Main
 
-int main() {}
+int main() {
+  NonStaticTests_all();
+}
