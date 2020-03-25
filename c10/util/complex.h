@@ -6,6 +6,7 @@
 namespace c10 {
 
 using Half = short;  // Just for the convenience of prototyping
+#define C10_HOST_DEVICE __host__ __device__ // Just for the convenience of prototyping
 
 // c10::complex is an implementation of complex numbers that aims
 // to work on all devices supported by PyTorch
@@ -83,7 +84,7 @@ struct alignas(sizeof(T) * 2) complex_common {
   constexpr complex_common(const std::complex<U> &other): complex_common(other.real(), other.imag()) {}
 #if defined(__CUDACC__) || defined(__HIPCC__)
   template<typename U>
-  complex_common(const thrust::complex<U> &other): complex_common(other.real(), other.imag()) {}
+  C10_HOST_DEVICE complex_common(const thrust::complex<U> &other): complex_common(other.real(), other.imag()) {}
 #endif
 
   constexpr complex<T> &operator =(T re) {
@@ -107,7 +108,7 @@ struct alignas(sizeof(T) * 2) complex_common {
 
 #if defined(__CUDACC__) || defined(__HIPCC__)
   template<typename U>
-  complex<T> &operator =(const thrust::complex<U> &rhs) {
+  C10_HOST_DEVICE complex<T> &operator =(const thrust::complex<U> &rhs) {
     storage[0] = rhs.real();
     storage[1] = rhs.imag();
     return reinterpret_cast<complex<T> &>(*this);
