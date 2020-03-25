@@ -33,7 +33,7 @@ using Half = short;  // Just for the convenience of prototyping
 //   explicit.
 // - We also define explicit casting from std::complex/thrust::complex
 //   - Note that the conversion from thrust is not constexpr, because
-//     thrust does not define them as constexpr
+//     thrust does not define them as constexpr ????
 //
 //
 // [Operator =]
@@ -80,7 +80,7 @@ struct alignas(sizeof(T) * 2) complex_common {
   constexpr complex_common(const std::complex<U> &other): complex_common(other.real(), other.imag()) {}
 #if defined(__CUDACC__) || defined(__HIPCC__)
   template<typename U>
-  complex_common(const thrust::complex<U> &other): complex_common(other.real(), other.imag()) {}
+  constexpr complex_common(const thrust::complex<U> &other): complex_common(other.real(), other.imag()) {}
 #endif
 
   constexpr complex<T> &operator =(T re) {

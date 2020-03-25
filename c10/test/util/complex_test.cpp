@@ -42,7 +42,7 @@ void test_construct_from_other() {
   static_assert(c10::complex<scalar_t>(c10::complex<other_t>(num1, num2)).imag() == num4, "");
 }
 
-void test_constructors() {
+void test_convert_constructors() {
   test_construct_from_scalar<c10::Half>();
   test_construct_from_scalar<float>();
   test_construct_from_scalar<double>();
@@ -78,7 +78,45 @@ void test_constructors() {
   test_construct_from_other<double, double>();
 }
 
+template<typename scalar_t>
+void test_construct_from_std() {
+  constexpr scalar_t num1 = scalar_t(1.23);
+  constexpr scalar_t num2 = scalar_t(4.56);
+  static_assert(c10::complex<scalar_t>(std::complex<scalar_t>(num1, num2)).real() == num1, "");
+  static_assert(c10::complex<scalar_t>(std::complex<scalar_t>(num1, num2)).imag() == num2, "");
+}
+
+void test_std_conversion() {
+  test_construct_from_std<float>();
+  test_construct_from_std<double>();
+}
+
+#if defined(__CUDACC__) || defined(__HIPCC__)
+
+template<typename scalar_t>
+void test_construct_from_thrust() {
+  constexpr scalar_t num1 = scalar_t(1.23);
+  constexpr scalar_t num2 = scalar_t(4.56);
+  static_assert(c10::complex<scalar_t>(thrust::complex<scalar_t>(num1, num2)).real() == num1, "");
+  static_assert(c10::complex<scalar_t>(thrust::complex<scalar_t>(num1, num2)).imag() == num2, "");
+}
+
+void test_thrust_conversion() {
+  test_construct_from_thrust<float>();
+  test_construct_from_thrust<double>();
+}
+
+#endif
+
 }  // constructors
+
+namespace assignment {
+
+
+
+} // namespace assignment
+
+
 
 // Main
 
