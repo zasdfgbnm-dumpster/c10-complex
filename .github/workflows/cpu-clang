@@ -1,0 +1,20 @@
+
+name: CPU-CLANG
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: build
+      run: clang++ -std=c++14 -I. c10/test/util/complex_test.cpp -o test
+    - name: run
+      run: ./test
