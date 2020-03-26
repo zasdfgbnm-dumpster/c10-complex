@@ -97,50 +97,50 @@ struct alignas(sizeof(T) * 2) complex_common {
 
   constexpr complex<T> &operator =(T re) {
     storage[0] = re;
-    return reinterpret_cast<complex<T> &>(*this);
+    return static_cast<complex<T> &>(*this);
   }
 
   constexpr complex<T> &operator +=(T re) {
     storage[0] += re;
-    return reinterpret_cast<complex<T> &>(*this);
+    return static_cast<complex<T> &>(*this);
   }
 
   constexpr complex<T> &operator -=(T re) {
     storage[0] -= re;
-    return reinterpret_cast<complex<T> &>(*this);
+    return static_cast<complex<T> &>(*this);
   }
 
   constexpr complex<T> &operator *=(T re) {
     storage[0] *= re;
     storage[1] *= re;
-    return reinterpret_cast<complex<T> &>(*this);
+    return static_cast<complex<T> &>(*this);
   }
 
   constexpr complex<T> &operator /=(T re) {
     storage[0] /= re;
     storage[1] /= re;
-    return reinterpret_cast<complex<T> &>(*this);
+    return static_cast<complex<T> &>(*this);
   }
 
   template<typename U>
   constexpr complex<T> &operator =(const complex<U> &rhs) {
     storage[0] = rhs.real();
     storage[1] = rhs.imag();
-    return reinterpret_cast<complex<T> &>(*this);
+    return static_cast<complex<T> &>(*this);
   }
 
   template<typename U>
   constexpr complex<T> &operator +=(const complex<U> &rhs) {
     storage[0] += rhs.real();
     storage[1] += rhs.imag();
-    return reinterpret_cast<complex<T> &>(*this);
+    return static_cast<complex<T> &>(*this);
   }
 
   template<typename U>
   constexpr complex<T> &operator -=(const complex<U> &rhs) {
     storage[0] -= rhs.real();
     storage[1] -= rhs.imag();
-    return reinterpret_cast<complex<T> &>(*this);
+    return static_cast<complex<T> &>(*this);
   }
 
   template<typename U>
@@ -152,7 +152,7 @@ struct alignas(sizeof(T) * 2) complex_common {
     U d = rhs.imag();
     storage[0] = a * c - b * d;
     storage[1] = a * d + b * c;
-    return reinterpret_cast<complex<T> &>(*this);
+    return static_cast<complex<T> &>(*this);
   }
 
   template<typename U>
@@ -165,14 +165,14 @@ struct alignas(sizeof(T) * 2) complex_common {
     auto denominator = c * c + d * d;
     storage[0] = (a * c + b * d) / denominator;
     storage[1] = (b * c - a * d) / denominator;
-    return reinterpret_cast<complex<T> &>(*this);
+    return static_cast<complex<T> &>(*this);
   }
 
   template<typename U>
   constexpr complex<T> &operator =(const std::complex<U> &rhs) {
     storage[0] = rhs.real();
     storage[1] = rhs.imag();
-    return reinterpret_cast<complex<T> &>(*this);
+    return static_cast<complex<T> &>(*this);
   }
 
 #if defined(__CUDACC__) || defined(__HIPCC__)
@@ -180,7 +180,7 @@ struct alignas(sizeof(T) * 2) complex_common {
   C10_HOST_DEVICE complex<T> &operator =(const thrust::complex<U> &rhs) {
     storage[0] = rhs.real();
     storage[1] = rhs.imag();
-    return reinterpret_cast<complex<T> &>(*this);
+    return static_cast<complex<T> &>(*this);
   }
 #endif
 
