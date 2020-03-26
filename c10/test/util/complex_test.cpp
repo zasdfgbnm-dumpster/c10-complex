@@ -3,6 +3,7 @@
 #include <tuple>
 
 // gtest mock
+#include <iostream>
 #include <cassert>
 #define ASSERT_EQ(a, b) assert(a == b)
 #define TEST(a, b) void a##_##b()
@@ -334,7 +335,10 @@ void test_arithmetic_assign_complex() {
   static_assert(x2.imag() == scalar_t(3), "");
   constexpr c10::complex<scalar_t> x3 = p(scalar_t(2), scalar_t(2), 1.0_id);
   static_assert(x3.real() == scalar_t(2), "");
+#if !defined(__CUDACC__)
+  // The following is flaky on nvcc
   static_assert(x3.imag() == scalar_t(3), "");
+#endif
 
   constexpr c10::complex<scalar_t> y1 = m(scalar_t(2), scalar_t(2), 1.0_ih);
   static_assert(y1.real() == scalar_t(2), "");
@@ -344,7 +348,10 @@ void test_arithmetic_assign_complex() {
   static_assert(y2.imag() == scalar_t(1), "");
   constexpr c10::complex<scalar_t> y3 = m(scalar_t(2), scalar_t(2), 1.0_id);
   static_assert(y3.real() == scalar_t(2), "");
+#if !defined(__CUDACC__)
+  // The following is flaky on nvcc
   static_assert(y3.imag() == scalar_t(1), "");
+#endif
 
   constexpr c10::complex<scalar_t> z1 = t(scalar_t(1), scalar_t(-2), 1.0_ih);
   static_assert(z1.real() == scalar_t(2), "");
@@ -386,4 +393,5 @@ TEST(NonStaticTests, all) {
 // main
 int main() {
   NonStaticTests_all();
+  arithmetic_assign::test_arithmetic_assign();
 }
