@@ -57,7 +57,7 @@ using Half = short;  // Just for the convenience of prototyping
 // In addition to the standard assignment, we also provide assignment operators with std and thrust
 //
 //
-// [Operator""]
+// [Operator ""]
 //
 // std::complex has custom literals `i`, `if` and `if` defined in namespace `std::literals::complex_literals`.
 // We define our own custom literals in the namespace `c10::complex_literals`. Our custom literals does not
@@ -70,6 +70,14 @@ using Half = short;  // Just for the convenience of prototyping
 // In C++20, there are two overload of these functions, one it to return the real/imag, another is to set real/imag,
 // they are both constexpr. We follow this design.
 //
+//
+// [Operator +=,-=,*=,/=]
+//
+// Since C++20, these operators become constexpr. In our implementation, they are also constexpr.
+//
+// There are two types of such operators: operating with a real number, or operating with another complex number.
+// For the operating with a real number, the generic template form has argument type `const T &`, while the overload
+// for float/double/long double has `T`. We will follow the same type as float/double/long double in std.
 
 template<typename T>
 struct complex;
@@ -92,10 +100,71 @@ struct alignas(sizeof(T) * 2) complex_common {
     return reinterpret_cast<complex<T> &>(*this);
   }
 
+  constexpr complex<T> &operator +=(T re) {
+    storage[0] += re;
+    return reinterpret_cast<complex<T> &>(*this);
+  }
+
+  constexpr complex<T> &operator -=(T re) {
+    storage[0] -= re;
+    return reinterpret_cast<complex<T> &>(*this);
+  }
+
+  constexpr complex<T> &operator *=(T re) {
+    storage[0] *= re;
+    storage[1] *= re;
+    return reinterpret_cast<complex<T> &>(*this);
+  }
+
+  constexpr complex<T> &operator /=(T re) {
+    storage[0] /= re;
+    storage[1] /= re;
+    return reinterpret_cast<complex<T> &>(*this);
+  }
+
   template<typename U>
   constexpr complex<T> &operator =(const complex<U> &rhs) {
     storage[0] = rhs.real();
     storage[1] = rhs.imag();
+    return reinterpret_cast<complex<T> &>(*this);
+  }
+
+  template<typename U>
+  constexpr complex<T> &operator +=(const complex<U> &rhs) {
+    storage[0] += rhs.real();
+    storage[1] += rhs.imag();
+    return reinterpret_cast<complex<T> &>(*this);
+  }
+
+  template<typename U>
+  constexpr complex<T> &operator -=(const complex<U> &rhs) {
+    storage[0] -= rhs.real();
+    storage[1] -= rhs.imag();
+    return reinterpret_cast<complex<T> &>(*this);
+  }
+
+  template<typename U>
+  constexpr complex<T> &operator *=(const complex<U> &rhs) {
+    // (a + bi) * (c + di) = (a*c - b*d) + (a * d + b * c) i
+    T a = storage[0];
+    T b = storage[1];
+    U c = rhs.real();
+    U d = rhs.imag();
+    storage[0] = a * c - b * d;
+    storage[1] = a * d + b * c;
+    return reinterpret_cast<complex<T> &>(*this);
+  }
+
+  template<typename U>
+  constexpr complex<T> &operator /=(const complex<U> &rhs) {
+    // (a + bi) / (c + di) = (ac + bd)/(c^2 + d^2) + (bc - ad)/(c^2 + d^2) i
+    T a = storage[0];
+    T b = storage[1];
+    U c = rhs.real();
+    U d = rhs.imag();
+    auto denominator = c * c + d * d;
+    storage[0] = (a * c + b * d) / denominator;
+    storage[1] = (b * c - a * d) / denominator;
     return reinterpret_cast<complex<T> &>(*this);
   }
 
