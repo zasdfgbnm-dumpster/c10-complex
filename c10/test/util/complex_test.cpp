@@ -252,61 +252,117 @@ void test_real_imag_modify() {
 namespace arithmetic_assign {
 
 template<typename scalar_t>
+constexpr c10::complex<scalar_t> p(scalar_t value) {
+  c10::complex<scalar_t> result(scalar_t(2), scalar_t(2));
+  result += value;
+  return result;
+}
+
+template<typename scalar_t>
+constexpr c10::complex<scalar_t> m(scalar_t value) {
+  c10::complex<scalar_t> result(scalar_t(2), scalar_t(2));
+  result -= value;
+  return result;
+}
+
+template<typename scalar_t>
+constexpr c10::complex<scalar_t> t(scalar_t value) {
+  c10::complex<scalar_t> result(scalar_t(2), scalar_t(2));
+  result *= value;
+  return result;
+}
+
+template<typename scalar_t>
+constexpr c10::complex<scalar_t> d(scalar_t value) {
+  c10::complex<scalar_t> result(scalar_t(2), scalar_t(2));
+  result /= value;
+  return result;
+}
+
+template<typename scalar_t>
 void test_arithmetic_assign_scalar() {
-  constexpr c10::complex<scalar_t> x = (c10::complex<scalar_t>(scalar_t(2), scalar_t(2)) += scalar_t(1));
+  constexpr c10::complex<scalar_t> x = p(scalar_t(1));
   static_assert(x.real() == scalar_t(3), "");
   static_assert(x.imag() == scalar_t(2), "");
-  constexpr c10::complex<scalar_t> y = (c10::complex<scalar_t>(scalar_t(2), scalar_t(2)) -= scalar_t(1));
+  constexpr c10::complex<scalar_t> y = m(scalar_t(1));
   static_assert(y.real() == scalar_t(1), "");
   static_assert(y.imag() == scalar_t(2), "");
-  constexpr c10::complex<scalar_t> z = (c10::complex<scalar_t>(scalar_t(2), scalar_t(2)) *= scalar_t(2));
+  constexpr c10::complex<scalar_t> z = t(scalar_t(2));
   static_assert(z.real() == scalar_t(4), "");
   static_assert(z.imag() == scalar_t(4), "");
-  constexpr c10::complex<scalar_t> t = (c10::complex<scalar_t>(scalar_t(2), scalar_t(2)) /= scalar_t(2));
+  constexpr c10::complex<scalar_t> t = d(scalar_t(2));
   static_assert(t.real() == scalar_t(1), "");
   static_assert(t.imag() == scalar_t(1), "");
+}
+
+template<typename scalar_t, typename rhs_t>
+constexpr c10::complex<scalar_t> p(scalar_t real, scalar_t imag, c10::complex<rhs_t> rhs) {
+  c10::complex<scalar_t> result(real, imag);
+  result += rhs;
+  return result;
+}
+
+template<typename scalar_t, typename rhs_t>
+constexpr c10::complex<scalar_t> m(scalar_t real, scalar_t imag, c10::complex<rhs_t> rhs) {
+  c10::complex<scalar_t> result(real, imag);
+  result -= rhs;
+  return result;
+}
+
+template<typename scalar_t, typename rhs_t>
+constexpr c10::complex<scalar_t> t(scalar_t real, scalar_t imag, c10::complex<rhs_t> rhs) {
+  c10::complex<scalar_t> result(real, imag);
+  result *= rhs;
+  return result;
+}
+
+template<typename scalar_t, typename rhs_t>
+constexpr c10::complex<scalar_t> d(scalar_t real, scalar_t imag, c10::complex<rhs_t> rhs) {
+  c10::complex<scalar_t> result(real, imag);
+  result /= rhs;
+  return result;
 }
 
 template<typename scalar_t>
 void test_arithmetic_assign_complex() {
   using namespace c10::complex_literals;
-  constexpr c10::complex<scalar_t> x1 = (c10::complex<scalar_t>(scalar_t(2), scalar_t(2)) += 1.0_ih);
+  constexpr c10::complex<scalar_t> x1 = p(scalar_t(2), scalar_t(2), 1.0_ih);
   static_assert(x1.real() == scalar_t(2), "");
   static_assert(x1.imag() == scalar_t(3), "");
-  constexpr c10::complex<scalar_t> x2 = (c10::complex<scalar_t>(scalar_t(2), scalar_t(2)) += 1.0_if);
+  constexpr c10::complex<scalar_t> x2 = p(scalar_t(2), scalar_t(2), 1.0_if);
   static_assert(x2.real() == scalar_t(2), "");
   static_assert(x2.imag() == scalar_t(3), "");
-  constexpr c10::complex<scalar_t> x3 = (c10::complex<scalar_t>(scalar_t(2), scalar_t(2)) += 1.0_id);
+  constexpr c10::complex<scalar_t> x3 = p(scalar_t(2), scalar_t(2), 1.0_id);
   static_assert(x3.real() == scalar_t(2), "");
-  static_assert(x3.imag() == scalar_t(3), "");
+  static_assert(x3.imag() - scalar_t(3), "");
 
-  constexpr c10::complex<scalar_t> y1 = (c10::complex<scalar_t>(scalar_t(2), scalar_t(2)) -= 1.0_ih);
+  constexpr c10::complex<scalar_t> y1 = m(scalar_t(2), scalar_t(2), 1.0_ih);
   static_assert(y1.real() == scalar_t(2), "");
   static_assert(y1.imag() == scalar_t(1), "");
-  constexpr c10::complex<scalar_t> y2 = (c10::complex<scalar_t>(scalar_t(2), scalar_t(2)) -= 1.0_if);
+  constexpr c10::complex<scalar_t> y2 = m(scalar_t(2), scalar_t(2), 1.0_if);
   static_assert(y2.real() == scalar_t(2), "");
   static_assert(y2.imag() == scalar_t(1), "");
-  constexpr c10::complex<scalar_t> y3 = (c10::complex<scalar_t>(scalar_t(2), scalar_t(2)) -= 1.0_id);
+  constexpr c10::complex<scalar_t> y3 = m(scalar_t(2), scalar_t(2), 1.0_id);
   static_assert(y3.real() == scalar_t(2), "");
   static_assert(y3.imag() == scalar_t(1), "");
 
-  constexpr c10::complex<scalar_t> z1 = (c10::complex<scalar_t>(scalar_t(1), scalar_t(-2)) *= 1.0_ih);
+  constexpr c10::complex<scalar_t> z1 = t(scalar_t(1), scalar_t(-2), 1.0_ih);
   static_assert(z1.real() == scalar_t(2), "");
   static_assert(z1.imag() == scalar_t(1), "");
-  constexpr c10::complex<scalar_t> z2 = (c10::complex<scalar_t>(scalar_t(1), scalar_t(-2)) *= 1.0_if);
+  constexpr c10::complex<scalar_t> z2 = t(scalar_t(1), scalar_t(-2), 1.0_if);
   static_assert(z2.real() == scalar_t(2), "");
   static_assert(z2.imag() == scalar_t(1), "");
-  constexpr c10::complex<scalar_t> z3 = (c10::complex<scalar_t>(scalar_t(1), scalar_t(-2)) *= 1.0_id);
+  constexpr c10::complex<scalar_t> z3 = t(scalar_t(1), scalar_t(-2), 1.0_id);
   static_assert(z3.real() == scalar_t(2), "");
   static_assert(z3.imag() == scalar_t(1), "");
 
-  constexpr c10::complex<scalar_t> t1 = (c10::complex<scalar_t>(scalar_t(-1), scalar_t(2)) /= 1.0_ih);
+  constexpr c10::complex<scalar_t> t1 = d(scalar_t(-1), scalar_t(2), 1.0_ih);
   static_assert(t1.real() == scalar_t(2), "");
   static_assert(t1.imag() == scalar_t(1), "");
-  constexpr c10::complex<scalar_t> t2 = (c10::complex<scalar_t>(scalar_t(-1), scalar_t(2)) /= 1.0_if);
+  constexpr c10::complex<scalar_t> t2 = d(scalar_t(-1), scalar_t(2), 1.0_if);
   static_assert(t2.real() == scalar_t(2), "");
   static_assert(t2.imag() == scalar_t(1), "");
-  constexpr c10::complex<scalar_t> t3 = (c10::complex<scalar_t>(scalar_t(-1), scalar_t(2)) /= 1.0_id);
+  constexpr c10::complex<scalar_t> t3 = d(scalar_t(-1), scalar_t(2), 1.0_id);
   static_assert(t3.real() == scalar_t(2), "");
   static_assert(t3.imag() == scalar_t(1), "");
 }
