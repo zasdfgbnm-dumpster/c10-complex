@@ -334,7 +334,7 @@ void test_arithmetic_assign_complex() {
   static_assert(x2.imag() == scalar_t(3), "");
   constexpr c10::complex<scalar_t> x3 = p(scalar_t(2), scalar_t(2), 1.0_id);
   static_assert(x3.real() == scalar_t(2), "");
-  static_assert(x3.imag() - scalar_t(3), "");
+  static_assert(x3.imag() == scalar_t(3), "");
 
   constexpr c10::complex<scalar_t> y1 = m(scalar_t(2), scalar_t(2), 1.0_ih);
   static_assert(y1.real() == scalar_t(2), "");
