@@ -14,6 +14,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: build
-      run: gcc -std=c++14 -I. c10/test/util/complex_test.cpp -o test
+      run: g++ -std=c++14 -I. c10/test/util/complex_test.cpp -o test
     - name: run
       run: ./test
