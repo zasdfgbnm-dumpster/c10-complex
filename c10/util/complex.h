@@ -455,28 +455,33 @@ constexpr T norm(const c10::complex<T>& z) {
 //   template< class DoubleOrInteger >
 //   constexpr std::complex<double> conj( DoubleOrInteger z );
 //   constexpr std::complex<long double> conj( long double z );
-// To access functions with similar behavior, use c10::conj
+// These are not implemented
 template<typename T>
 constexpr c10::complex<T> conj(const c10::complex<T>& z) {
   return c10::complex<T>(z.real(), -z.imag());
+}
+
+// For std::proj, there are other versions of it:
+//   constexpr std::complex<float> proj( float z );
+//   template< class DoubleOrInteger >
+//   constexpr std::complex<double> proj( DoubleOrInteger z );
+//   constexpr std::complex<long double> proj( long double z );
+// These are not implemented
+template<typename T>
+C10_HOST_DEVICE c10::complex<T> proj(const c10::complex<T>& z) {
+#if defined(__CUDACC__) || defined(__HIPCC__)
+  return static_cast<c10::complex<T>>(thrust::proj(static_cast<thrust::complex<T>>(z)));
+#else
+  return static_cast<c10::complex<T>>(std::proj(static_cast<std::complex<T>>(z)));
+#endif
 }
 
 // There is no c10 version of std::polar, because std::polar always
 // returns std::complex. Use c10::polar instead;
 
-}  // namespace std
+} // namespace std
 
 namespace c10 {
-
-// See the std::conj above
-template<typename T>
-constexpr c10::complex<T> conj(const c10::complex<T>& z) {
-  return c10::complex<T>(z.real(), -z.imag());
-}
-template<typename T>
-constexpr c10::complex<T> conj(T z) {
-  return {z, 0};
-}
 
 template<typename T>
 C10_HOST_DEVICE c10::complex<T> polar(const T& r, const T& theta = T()) {
@@ -487,7 +492,7 @@ C10_HOST_DEVICE c10::complex<T> polar(const T& r, const T& theta = T()) {
 #endif
 }
 
-}
+} // namespace c10
 
 // math functions are included in a separate file
 #include <c10/util/complex_math.h>

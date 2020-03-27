@@ -473,8 +473,7 @@ C10_HOST_DEVICE void test_callable_() {
   std::arg(c10::complex<scalar_t>(1, 2));
   static_assert(std::norm(c10::complex<scalar_t>(3, 4)) == scalar_t(25), "");
   static_assert(std::conj(c10::complex<scalar_t>(3, 4)) == c10::complex<scalar_t>(3, -4), "");
-  static_assert(c10::conj(c10::complex<scalar_t>(3, 4)) == c10::complex<scalar_t>(3, -4), "");
-  static_assert(c10::conj(scalar_t(2)) == c10::complex<scalar_t>(2, 0), "");
+  // TODO: add half
   c10::polar(float(1), float(PI / 2));
   c10::polar(double(1), double(PI / 2));
 }
@@ -489,7 +488,6 @@ template<typename scalar_t>
 void test_values_() {
   ASSERT_EQ(std::abs(c10::complex<scalar_t>(3, 4)), scalar_t(5));
   ASSERT_EQ(std::arg(c10::complex<scalar_t>(0, 1)), PI / 2);
-  ASSERT_EQ(c10::polar(scalar_t(1), scalar_t(PI / 2)), c10::complex<scalar_t>(0, 1));
   ASSERT_EQ(c10::polar(scalar_t(1), scalar_t(PI / 2)), c10::complex<scalar_t>(0, 1));
 }
 
