@@ -417,6 +417,23 @@ void test_arithmetic() {
 
 } // namespace arithmetic
 
+namespace equality {
+
+template<typename scalar_t>
+void test_equality_() {
+  static_assert(c10::complex<scalar_t>(1, 2) == c10::complex<scalar_t>(1, 2), "");
+  static_assert(c10::complex<scalar_t>(1, 2) != c10::complex<scalar_t>(3, 4), "");
+}
+
+void test_equality() {
+  test_equality_<c10::Half>();
+  test_equality_<float>();
+  test_equality_<double>();
+}
+  
+} // namespace equality
+
+
 
 TEST(NonStaticTests, all) {
   constructors::test_thrust_conversion();
