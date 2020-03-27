@@ -489,12 +489,13 @@ template<typename scalar_t>
 void test_values_() {
   ASSERT_EQ(std::abs(c10::complex<scalar_t>(3, 4)), scalar_t(5));
   ASSERT_EQ(std::arg(c10::complex<scalar_t>(0, 1)), PI / 2);
-  ASSERT_EQ(c10::polar(float(1), float(PI / 2)), c10::complex<float>(0, 1));
-  ASSERT_EQ(c10::polar(double(1), double(PI / 2)), c10::complex<double>(0, 1));
+  ASSERT_EQ(c10::polar(scalar_t(1), scalar_t(PI / 2)), c10::complex<scalar_t>(0, 1));
+  ASSERT_EQ(c10::polar(scalar_t(1), scalar_t(PI / 2)), c10::complex<scalar_t>(0, 1));
 }
 
 void test_values() {
-  test_values_<c10::Half>();
+  // TODO: enable when moved to PyTorch
+  // test_values_<c10::Half>();
   test_values_<float>();
   test_values_<double>();
 }

@@ -450,7 +450,7 @@ constexpr T norm(const c10::complex<T>& z) {
   return z.real() * z.real() + z.imag() * z.imag();
 }
 
-// For std::conj, there are versions of it:
+// For std::conj, there are other versions of it:
 //   constexpr std::complex<float> conj( float z );
 //   template< class DoubleOrInteger >
 //   constexpr std::complex<double> conj( DoubleOrInteger z );
