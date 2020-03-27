@@ -492,6 +492,7 @@ void test_values_() {
 
 void test_values() {
   ASSERT_EQ(std::abs(c10::complex<c10::Half>(3, 4)), c10::Half(5));
+  // FIXME: ASSERT_LT(std::abs(std::arg(c10::complex<c10::Half>(0, 1)) - PI / 2), 1e-6);
   // TODO(@zasdfgbnm): thrust::complex only support float and double, how do we handle c10::Half?
   test_values_<float>();
   test_values_<double>();
