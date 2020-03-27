@@ -14,7 +14,8 @@ const double PI = 3.141592653589793238463;
 // gtest mock
 #include <iostream>
 #include <cassert>
-#define ASSERT_EQ(a, b) assert(a == b)
+#define ASSERT_EQ(a, b) assert((a) == (b))
+#define ASSERT_LT(a, b) assert((a) < (b))
 #define TEST(a, b) void a##_##b()
 
 namespace memory {
@@ -487,7 +488,7 @@ MAYBE_GLOBAL void test_callable() {
 template<typename scalar_t>
 void test_values_() {
   ASSERT_EQ(std::abs(c10::complex<scalar_t>(3, 4)), scalar_t(5));
-  ASSERT_EQ(std::arg(c10::complex<scalar_t>(0, 1)), PI / 2);
+  ASSERT_LT(std::abs(std::arg(c10::complex<scalar_t>(0, 1)) - PI / 2), 1e-6);
   ASSERT_EQ(c10::polar(scalar_t(1), scalar_t(PI / 2)), c10::complex<scalar_t>(0, 1));
 }
 
