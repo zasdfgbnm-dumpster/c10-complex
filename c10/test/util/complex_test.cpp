@@ -473,7 +473,7 @@ C10_HOST_DEVICE void test_callable_() {
   std::arg(c10::complex<scalar_t>(1, 2));
   static_assert(std::norm(c10::complex<scalar_t>(3, 4)) == scalar_t(25), "");
   static_assert(std::conj(c10::complex<scalar_t>(3, 4)) == c10::complex<scalar_t>(3, -4), "");
-  // TODO: add half
+  // TODO: add half test for c10::polar
   c10::polar(float(1), float(PI / 2));
   c10::polar(double(1), double(PI / 2));
 }
