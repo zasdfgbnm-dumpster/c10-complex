@@ -2,6 +2,12 @@
 #include <type_traits>
 #include <tuple>
 
+#if (defined(__CUDACC__) || defined(__HIPCC__)) && !defined(C10_HOST_DEVICE)
+#define MAYBE_GLOBAL __global__
+#else
+#define MAYBE_GLOBAL
+#endif
+
 // gtest mock
 #include <iostream>
 #include <cassert>
@@ -10,13 +16,13 @@
 
 namespace memory {
 
-C10_HOST_DEVICE void test_size() {
+MAYBE_GLOBAL void test_size() {
   static_assert(sizeof(c10::complex<c10::Half>) == 4, "");
   static_assert(sizeof(c10::complex<float>) == 8, "");
   static_assert(sizeof(c10::complex<double>) == 16, "");
 }
 
-C10_HOST_DEVICE void test_align() {
+MAYBE_GLOBAL void test_align() {
   static_assert(alignof(c10::complex<c10::Half>) == 4, "");
   static_assert(alignof(c10::complex<float>) == 8, "");
   static_assert(alignof(c10::complex<double>) == 16, "");
@@ -49,7 +55,7 @@ C10_HOST_DEVICE void test_construct_from_other() {
   static_assert(c10::complex<scalar_t>(c10::complex<other_t>(num1, num2)).imag() == num4, "");
 }
 
-C10_HOST_DEVICE void test_convert_constructors() {
+MAYBE_GLOBAL void test_convert_constructors() {
   test_construct_from_scalar<c10::Half>();
   test_construct_from_scalar<float>();
   test_construct_from_scalar<double>();
@@ -93,7 +99,7 @@ C10_HOST_DEVICE void test_construct_from_std() {
   static_assert(c10::complex<scalar_t>(std::complex<scalar_t>(num1, num2)).imag() == num2, "");
 }
 
-C10_HOST_DEVICE void test_std_conversion() {
+MAYBE_GLOBAL void test_std_conversion() {
   test_construct_from_std<float>();
   test_construct_from_std<double>();
 }
@@ -127,7 +133,7 @@ constexpr c10::complex<scalar_t> one() {
   return result;
 }
 
-C10_HOST_DEVICE void test_assign_real() {
+MAYBE_GLOBAL void test_assign_real() {
   static_assert(one<c10::Half>().real() == c10::Half(1), "");
   static_assert(one<c10::Half>().imag() == c10::Half(), "");
   static_assert(one<float>().real() == float(1), "");
@@ -145,7 +151,7 @@ constexpr std::tuple<c10::complex<double>, c10::complex<float>, c10::complex<c10
   return std::make_tuple(ret0, ret1, ret2);
 }
 
-C10_HOST_DEVICE void test_assign_other() {
+MAYBE_GLOBAL void test_assign_other() {
   constexpr auto tup = ones();
   static_assert(std::get<c10::complex<double>>(tup).real() == double(1), "");
   static_assert(std::get<c10::complex<double>>(tup).imag() == double(1), "");
@@ -164,7 +170,7 @@ constexpr std::tuple<c10::complex<double>, c10::complex<float>, c10::complex<c10
   return std::make_tuple(ret0, ret1, ret2);
 }
 
-C10_HOST_DEVICE void test_assign_std() {
+MAYBE_GLOBAL void test_assign_std() {
   constexpr auto tup = ones_std();
   static_assert(std::get<c10::complex<double>>(tup).real() == double(1), "");
   static_assert(std::get<c10::complex<double>>(tup).imag() == double(1), "");
@@ -201,7 +207,7 @@ C10_HOST_DEVICE void test_assign_thrust() {
 
 namespace literals {
 
-C10_HOST_DEVICE void test_complex_literals() {
+MAYBE_GLOBAL void test_complex_literals() {
   using namespace c10::complex_literals;
   static_assert(std::is_same<decltype(0.5_ih), c10::complex<c10::Half>>::value, "");
   static_assert((0.5_ih).real() == c10::Half(), "");
@@ -219,20 +225,20 @@ C10_HOST_DEVICE void test_complex_literals() {
 namespace real_imag {
 
 template<typename scalar_t>
-C10_HOST_DEVICE constexpr c10::complex<scalar_t> zero_one() {
+constexpr c10::complex<scalar_t> zero_one() {
   c10::complex<scalar_t> result;
   result.imag(scalar_t(1));
   return result;
 }
 
 template<typename scalar_t>
-C10_HOST_DEVICE constexpr c10::complex<scalar_t> one_zero() {
+constexpr c10::complex<scalar_t> one_zero() {
   c10::complex<scalar_t> result;
   result.real(scalar_t(1));
   return result;
 }
 
-C10_HOST_DEVICE void test_real_imag_modify() {
+MAYBE_GLOBAL void test_real_imag_modify() {
   static_assert(zero_one<c10::Half>().real() == c10::Half(0), "");
   static_assert(zero_one<c10::Half>().imag() == c10::Half(1), "");
   static_assert(zero_one<float>().real() == float(0), "");
@@ -253,35 +259,35 @@ C10_HOST_DEVICE void test_real_imag_modify() {
 namespace arithmetic_assign {
 
 template<typename scalar_t>
-C10_HOST_DEVICE constexpr c10::complex<scalar_t> p(scalar_t value) {
+constexpr c10::complex<scalar_t> p(scalar_t value) {
   c10::complex<scalar_t> result(scalar_t(2), scalar_t(2));
   result += value;
   return result;
 }
 
 template<typename scalar_t>
-C10_HOST_DEVICE constexpr c10::complex<scalar_t> m(scalar_t value) {
+constexpr c10::complex<scalar_t> m(scalar_t value) {
   c10::complex<scalar_t> result(scalar_t(2), scalar_t(2));
   result -= value;
   return result;
 }
 
 template<typename scalar_t>
-C10_HOST_DEVICE constexpr c10::complex<scalar_t> t(scalar_t value) {
+constexpr c10::complex<scalar_t> t(scalar_t value) {
   c10::complex<scalar_t> result(scalar_t(2), scalar_t(2));
   result *= value;
   return result;
 }
 
 template<typename scalar_t>
-C10_HOST_DEVICE constexpr c10::complex<scalar_t> d(scalar_t value) {
+constexpr c10::complex<scalar_t> d(scalar_t value) {
   c10::complex<scalar_t> result(scalar_t(2), scalar_t(2));
   result /= value;
   return result;
 }
 
 template<typename scalar_t>
-C10_HOST_DEVICE void test_arithmetic_assign_scalar() {
+MAYBE_GLOBAL void test_arithmetic_assign_scalar() {
   constexpr c10::complex<scalar_t> x = p(scalar_t(1));
   static_assert(x.real() == scalar_t(3), "");
   static_assert(x.imag() == scalar_t(2), "");
@@ -297,35 +303,35 @@ C10_HOST_DEVICE void test_arithmetic_assign_scalar() {
 }
 
 template<typename scalar_t, typename rhs_t>
-C10_HOST_DEVICE constexpr c10::complex<scalar_t> p(scalar_t real, scalar_t imag, c10::complex<rhs_t> rhs) {
+constexpr c10::complex<scalar_t> p(scalar_t real, scalar_t imag, c10::complex<rhs_t> rhs) {
   c10::complex<scalar_t> result(real, imag);
   result += rhs;
   return result;
 }
 
 template<typename scalar_t, typename rhs_t>
-C10_HOST_DEVICE constexpr c10::complex<scalar_t> m(scalar_t real, scalar_t imag, c10::complex<rhs_t> rhs) {
+constexpr c10::complex<scalar_t> m(scalar_t real, scalar_t imag, c10::complex<rhs_t> rhs) {
   c10::complex<scalar_t> result(real, imag);
   result -= rhs;
   return result;
 }
 
 template<typename scalar_t, typename rhs_t>
-C10_HOST_DEVICE constexpr c10::complex<scalar_t> t(scalar_t real, scalar_t imag, c10::complex<rhs_t> rhs) {
+constexpr c10::complex<scalar_t> t(scalar_t real, scalar_t imag, c10::complex<rhs_t> rhs) {
   c10::complex<scalar_t> result(real, imag);
   result *= rhs;
   return result;
 }
 
 template<typename scalar_t, typename rhs_t>
-C10_HOST_DEVICE constexpr c10::complex<scalar_t> d(scalar_t real, scalar_t imag, c10::complex<rhs_t> rhs) {
+constexpr c10::complex<scalar_t> d(scalar_t real, scalar_t imag, c10::complex<rhs_t> rhs) {
   c10::complex<scalar_t> result(real, imag);
   result /= rhs;
   return result;
 }
 
 template<typename scalar_t>
-C10_HOST_DEVICE void test_arithmetic_assign_complex() {
+void test_arithmetic_assign_complex() {
   using namespace c10::complex_literals;
   constexpr c10::complex<scalar_t> x1 = p(scalar_t(2), scalar_t(2), 1.0_ih);
   static_assert(x1.real() == scalar_t(2), "");
@@ -374,7 +380,7 @@ C10_HOST_DEVICE void test_arithmetic_assign_complex() {
   static_assert(t3.imag() == scalar_t(1), "");
 }
 
-C10_HOST_DEVICE void test_arithmetic_assign() {
+MAYBE_GLOBAL void test_arithmetic_assign() {
   test_arithmetic_assign_scalar<c10::Half>();
   test_arithmetic_assign_scalar<float>();
   test_arithmetic_assign_scalar<double>();
@@ -409,7 +415,7 @@ C10_HOST_DEVICE void test_arithmetic_() {
   static_assert(scalar_t(25) / c10::complex<scalar_t>(3, 4)  == c10::complex<scalar_t>(3, -4), "");
 }
 
-C10_HOST_DEVICE void test_arithmetic() {
+MAYBE_GLOBAL void test_arithmetic() {
   test_arithmetic_<c10::Half>();
   test_arithmetic_<float>();
   test_arithmetic_<double>();
@@ -425,7 +431,7 @@ C10_HOST_DEVICE void test_equality_() {
   static_assert(c10::complex<scalar_t>(1, 2) != c10::complex<scalar_t>(3, 4), "");
 }
 
-C10_HOST_DEVICE void test_equality() {
+MAYBE_GLOBAL void test_equality() {
   test_equality_<c10::Half>();
   test_equality_<float>();
   test_equality_<double>();
