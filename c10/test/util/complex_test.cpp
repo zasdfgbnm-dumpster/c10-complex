@@ -489,7 +489,7 @@ template<typename scalar_t>
 void test_values_() {
   ASSERT_EQ(std::abs(c10::complex<scalar_t>(3, 4)), scalar_t(5));
   ASSERT_LT(std::abs(std::arg(c10::complex<scalar_t>(0, 1)) - PI / 2), 1e-6);
-  ASSERT_EQ(std::abs(c10::polar(scalar_t(1), scalar_t(PI / 2)) - c10::complex<scalar_t>(0, 1)), 1e-6);
+  ASSERT_LT(std::abs(c10::polar(scalar_t(1), scalar_t(PI / 2)) - c10::complex<scalar_t>(0, 1)), 1e-6);
 }
 
 void test_values() {
