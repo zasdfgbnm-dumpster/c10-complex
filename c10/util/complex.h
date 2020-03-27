@@ -6,7 +6,11 @@
 namespace c10 {
 
 using Half = short;  // Just for the convenience of prototyping
+#if defined(__CUDACC__) || defined(__HIPCC__)
 #define C10_HOST_DEVICE __host__ __device__ // Just for the convenience of prototyping
+#else
+#define C10_HOST_DEVICE
+#endif
 
 // c10::complex is an implementation of complex numbers that aims
 // to work on all devices supported by PyTorch
