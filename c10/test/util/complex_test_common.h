@@ -120,6 +120,7 @@ C10_HOST_DEVICE void test_construct_from_thrust() {
 
 C10_HOST_DEVICE void test_thrust_conversion() {
 #if defined(__CUDACC__) || defined(__HIPCC__)
+  // TODO(@zasdfgbnm): thrust::complex only support float and double, how do we handle c10::Half?
   test_construct_from_thrust<float>();
   test_construct_from_thrust<double>();
 #endif
@@ -474,7 +475,7 @@ C10_HOST_DEVICE void test_callable_() {
   std::arg(c10::complex<scalar_t>(1, 2));
   static_assert(std::norm(c10::complex<scalar_t>(3, 4)) == scalar_t(25), "");
   static_assert(std::conj(c10::complex<scalar_t>(3, 4)) == c10::complex<scalar_t>(3, -4), "");
-  // TODO: add half test for c10::polar
+  // TODO(@zasdfgbnm): thrust::complex only support float and double, how do we handle c10::Half?
   c10::polar(float(1), float(PI / 2));
   c10::polar(double(1), double(PI / 2));
 }
@@ -493,8 +494,8 @@ void test_values_() {
 }
 
 void test_values() {
-  // TODO: enable when moved to PyTorch
-  // test_values_<c10::Half>();
+  ASSERT_EQ(std::abs(c10::complex<c10::Half>(3, 4)), c10::Half(5));
+  // TODO(@zasdfgbnm): thrust::complex only support float and double, how do we handle c10::Half?
   test_values_<float>();
   test_values_<double>();
 }

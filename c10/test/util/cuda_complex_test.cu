@@ -9,6 +9,12 @@ TEST(NonStaticHostTests, all) {
   test_std::test_values();
 }
 
+__global__ 
+
+TEST(DeviceTests, all) {
+}
+
 int main() {
   NonStaticHostTests_all();
+  DeviceTests_all();
 }

@@ -478,6 +478,7 @@ namespace c10 {
 template<typename T>
 C10_HOST_DEVICE c10::complex<T> polar(const T& r, const T& theta = T()) {
 #if defined(__CUDACC__) || defined(__HIPCC__)
+  // TODO(@zasdfgbnm): thrust::complex only support float and double, how do we handle c10::Half?
   return static_cast<c10::complex<T>>(thrust::polar(r, theta));
 #else
   return static_cast<c10::complex<T>>(std::polar(r, theta));
