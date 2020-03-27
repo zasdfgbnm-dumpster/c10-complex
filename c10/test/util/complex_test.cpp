@@ -1,6 +1,7 @@
 #include <c10/util/complex.h>
 #include <type_traits>
 #include <tuple>
+#include <sstream>
 
 #if (defined(__CUDACC__) || defined(__HIPCC__)) && !defined(C10_HOST_DEVICE)
 #define MAYBE_GLOBAL __global__
@@ -12,7 +13,7 @@
 #include <iostream>
 #include <cassert>
 #define ASSERT_EQ(a, b) assert(a == b)
-#define TEST(a, b) C10_HOST_DEVICE void a##_##b()
+#define TEST(a, b) void a##_##b()
 
 namespace memory {
 
@@ -439,11 +440,32 @@ MAYBE_GLOBAL void test_equality() {
   
 } // namespace equality
 
+namespace io {
+
+template<typename scalar_t>
+void test_io_() {
+  std::stringstream ss;
+  c10::complex<scalar_t> a(1, 2);
+  ss << a;
+  ASSERT_EQ(ss.str(), "(1,2)");
+  ss.str("(3,4)");
+  ss >> a;
+  ASSERT_EQ(a, c10::complex<scalar_t>(3, 4));
+}
+
+void test_io() {
+  test_io_<c10::Half>();
+  test_io_<float>();
+  test_io_<double>();
+}
+
+} // namespace io
 
 
 TEST(NonStaticTests, all) {
   constructors::test_thrust_conversion();
   assignment::test_assign_thrust();
+  io::test_io();
 }
 
 // main

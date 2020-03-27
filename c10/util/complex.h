@@ -1,4 +1,6 @@
 #include <complex>
+#include <iostream>
+
 #if defined(__CUDACC__) || defined(__HIPCC__)
 #include <thrust/complex.h>
 #endif
@@ -61,6 +63,11 @@ using Half = short;  // Just for the convenience of prototyping
 // In addition to the standard assignment, we also provide assignment operators with std and thrust
 //
 //
+// [Casting operators]
+//
+// std::complex does not have casting operators. We define casting operators casting to std::complex and thrust::complex
+//
+//
 // [Operator ""]
 //
 // std::complex has custom literals `i`, `if` and `if` defined in namespace `std::literals::complex_literals`.
@@ -102,6 +109,10 @@ using Half = short;  // Just for the convenience of prototyping
 // - real == complex
 // 
 // Some of them are removed on C++20, but we decide to keep them
+//
+// [Operator <<, >>]
+//
+// These are implemented by casting to std::complex
 
 template<typename T>
 struct complex;
@@ -205,6 +216,18 @@ struct alignas(sizeof(T) * 2) complex_common {
     storage[0] = rhs.real();
     storage[1] = rhs.imag();
     return static_cast<complex<T> &>(*this);
+  }
+#endif
+
+  template<typename U>
+  explicit constexpr operator std::complex<U>() const {
+    return std::complex<U>(std::complex<T>(real(), imag()));
+  }
+
+#if defined(__CUDACC__) || defined(__HIPCC__)
+  template<typename U>
+  explicit operator thrust::complex<U>() const {
+    return thrust::complex<U>(thrust::complex<T>(real(), imag()));
   }
 #endif
 
@@ -381,6 +404,19 @@ constexpr bool operator!=(const c10::complex<T>& lhs, const T& rhs) {
 template<typename T>
 constexpr bool operator!=(const T& lhs, const c10::complex<T>& rhs) {
   return !(lhs == rhs);
+}
+
+template <class T, class CharT, class Traits>
+std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits>& os, const c10::complex<T>& x) {
+  return (os << static_cast<std::complex<T>>(x));
+}
+
+template <class T, class CharT, class Traits>
+std::basic_istream<CharT, Traits>& operator>>(std::basic_istream<CharT, Traits>& is, c10::complex<T>& x) {
+  std::complex<T> tmp;
+  is >> tmp;
+  x = tmp;
+  return is;
 }
 
 #include <c10/util/complex_math.h>
