@@ -461,6 +461,9 @@ constexpr c10::complex<T> conj(const c10::complex<T>& z) {
   return c10::complex<T>(z.real(), -z.imag());
 }
 
+// There is no c10 version of std::polar, because std::polar always
+// returns std::complex. Use c10::polar instead;
+
 }  // namespace std
 
 namespace c10 {
@@ -473,6 +476,15 @@ constexpr c10::complex<T> conj(const c10::complex<T>& z) {
 template<typename T>
 constexpr c10::complex<T> conj(T z) {
   return {z, 0};
+}
+
+template<typename T>
+C10_HOST_DEVICE c10::complex<T> polar(const T& r, const T& theta = T()) {
+#if defined(__CUDACC__) || defined(__HIPCC__)
+  return static_cast<c10::complex<T>>(thrust::polar(r, theta));
+#else
+  return static_cast<c10::complex<T>>(std::polar(r, theta));
+#endif
 }
 
 }
