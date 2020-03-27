@@ -9,6 +9,8 @@
 #define MAYBE_GLOBAL
 #endif
 
+const double PI = 3.141592653589793238463;
+
 // gtest mock
 #include <iostream>
 #include <cassert>
@@ -461,13 +463,18 @@ void test_io() {
 
 } // namespace io
 
-namespace test_std_basic {
+namespace test_std {
 
 template<typename scalar_t>
 C10_HOST_DEVICE void test_callable_() {
   static_assert(std::real(c10::complex<scalar_t>(1, 2)) == scalar_t(1), "");
   static_assert(std::imag(c10::complex<scalar_t>(1, 2)) == scalar_t(2), "");
   std::abs(c10::complex<scalar_t>(1, 2));
+  std::arg(c10::complex<scalar_t>(1, 2));
+  static_assert(std::norm(c10::complex<scalar_t>(3, 4)) == scalar_t(25), "");
+  static_assert(std::conj(c10::complex<scalar_t>(3, 4)) == c10::complex<scalar_t>(3, -4), "");
+  static_assert(c10::conj(c10::complex<scalar_t>(3, 4)) == c10::complex<scalar_t>(3, -4), "");
+  static_assert(c10::conj(scalar_t(2)) == c10::complex<scalar_t>(2, 0), "");
 }
 
 MAYBE_GLOBAL void test_callable() {
@@ -479,6 +486,7 @@ MAYBE_GLOBAL void test_callable() {
 template<typename scalar_t>
 void test_values_() {
   ASSERT_EQ(std::abs(c10::complex<scalar_t>(3, 4)), scalar_t(5));
+  ASSERT_EQ(std::arg(c10::complex<scalar_t>(0, 1)), PI / 2);
 }
 
 void test_values() {
@@ -487,18 +495,16 @@ void test_values() {
   test_values_<double>();
 }
 
-}
-
+} // namespace test_std
 
 TEST(NonStaticTests, all) {
   constructors::test_thrust_conversion();
   assignment::test_assign_thrust();
   io::test_io();
-  test_std_basic::test_values();
+  test_std::test_values();
 }
 
 // main
 int main() {
   NonStaticTests_all();
-  arithmetic_assign::test_arithmetic_assign();
 }

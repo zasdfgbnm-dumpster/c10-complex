@@ -406,12 +406,12 @@ constexpr bool operator!=(const T& lhs, const c10::complex<T>& rhs) {
   return !(lhs == rhs);
 }
 
-template <class T, class CharT, class Traits>
+template <typename T, typename CharT, typename Traits>
 std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits>& os, const c10::complex<T>& x) {
   return (os << static_cast<std::complex<T>>(x));
 }
 
-template <class T, class CharT, class Traits>
+template <typename T, typename CharT, typename Traits>
 std::basic_istream<CharT, Traits>& operator>>(std::basic_istream<CharT, Traits>& is, c10::complex<T>& x) {
   std::complex<T> tmp;
   is >> tmp;
@@ -425,21 +425,57 @@ std::basic_istream<CharT, Traits>& operator>>(std::basic_istream<CharT, Traits>&
 
 namespace std {
 
-template< class T >
+template<typename T>
 constexpr T real(const c10::complex<T>& z) {
   return z.real();
 }
 
-template< class T >
+template<typename T>
 constexpr T imag(const c10::complex<T>& z) {
   return z.imag();
 }
 
-template< class T >
+template<typename T>
 C10_HOST_DEVICE T abs(const c10::complex<T>& z) {
   return std::hypot(std::real(z), std::imag(z));
 }
 
+template<typename T>
+C10_HOST_DEVICE T arg(const c10::complex<T>& z) {
+  return std::atan2(std::imag(z), std::real(z));
+}
+
+template<typename T>
+constexpr T norm(const c10::complex<T>& z) {
+  return z.real() * z.real() + z.imag() * z.imag();
+}
+
+// For std::conj, there are versions of it:
+//   constexpr std::complex<float> conj( float z );
+//   template< class DoubleOrInteger >
+//   constexpr std::complex<double> conj( DoubleOrInteger z );
+//   constexpr std::complex<long double> conj( long double z );
+// To access functions with similar behavior, use c10::conj
+template<typename T>
+constexpr c10::complex<T> conj(const c10::complex<T>& z) {
+  return c10::complex<T>(z.real(), -z.imag());
+}
+
 }  // namespace std
 
+namespace c10 {
+
+// See the std::conj above
+template<typename T>
+constexpr c10::complex<T> conj(const c10::complex<T>& z) {
+  return c10::complex<T>(z.real(), -z.imag());
+}
+template<typename T>
+constexpr c10::complex<T> conj(T z) {
+  return {z, 0};
+}
+
+}
+
+// math functions are included in a separate file
 #include <c10/util/complex_math.h>
