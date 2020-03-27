@@ -186,25 +186,22 @@ MAYBE_GLOBAL void test_assign_std() {
 }
 
 #if defined(__CUDACC__) || defined(__HIPCC__)
-C10_HOST_DEVICE std::tuple<c10::complex<double>, c10::complex<float>, c10::complex<c10::Half>> ones_thrust() {
-  thrust::complex<c10::Half> src(1, 1);
+C10_HOST_DEVICE std::tuple<c10::complex<double>, c10::complex<float>> one_two_thrust() {
+  thrust::complex<float> src(1, 2);
   c10::complex<double> ret0;
   c10::complex<float> ret1;
-  c10::complex<c10::Half> ret2;
-  ret0 = ret1 = ret2 = src;
-  return std::make_tuple(ret0, ret1, ret2);
+  ret0 = ret1 = src;
+  return std::make_tuple(ret0, ret1);
 }
 #endif
 
 C10_HOST_DEVICE void test_assign_thrust() {
 #if defined(__CUDACC__) || defined(__HIPCC__)
-  auto tup = ones_thrust();
+  auto tup = one_two_thrust();
   ASSERT_EQ(std::get<c10::complex<double>>(tup).real(), double(1));
-  ASSERT_EQ(std::get<c10::complex<double>>(tup).imag(), double(1));
+  ASSERT_EQ(std::get<c10::complex<double>>(tup).imag(), double(2));
   ASSERT_EQ(std::get<c10::complex<float>>(tup).real(), float(1));
-  ASSERT_EQ(std::get<c10::complex<float>>(tup).imag(), float(1));
-  ASSERT_EQ(std::get<c10::complex<c10::Half>>(tup).real(), c10::Half(1));
-  ASSERT_EQ(std::get<c10::complex<c10::Half>>(tup).imag(), c10::Half(1));
+  ASSERT_EQ(std::get<c10::complex<float>>(tup).imag(), float(2));
 #endif
 }
 
@@ -501,3 +498,10 @@ void test_values() {
 }
 
 } // namespace test_std
+
+void run_all_host_tests() {
+  constructors::test_thrust_conversion();
+  assignment::test_assign_thrust();
+  io::test_io();
+  test_std::test_values();
+}
