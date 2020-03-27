@@ -78,6 +78,26 @@ using Half = short;  // Just for the convenience of prototyping
 // There are two types of such operators: operating with a real number, or operating with another complex number.
 // For the operating with a real number, the generic template form has argument type `const T &`, while the overload
 // for float/double/long double has `T`. We will follow the same type as float/double/long double in std.
+//
+// [Unary operator +-]
+//
+// Since C++20, they are constexpr. We also make them expr
+//
+// [Binary operators +-*/]
+//
+// Each operator has three versions (taking + as example):
+// - complex + complex
+// - complex + real
+// - real + complex
+//
+// [Operator ==, !=]
+// 
+// Each operator has three versions (taking == as example):
+// - complex == complex
+// - complex == real
+// - real == complex
+// 
+// Some of them are removed on C++20, but we decide to keep them
 
 template<typename T>
 struct complex;
@@ -246,5 +266,117 @@ constexpr complex<double> operator"" _id(long double imag) {
 } // namespace complex_literals
 
 } // namespace c10
+
+template<typename T>
+constexpr c10::complex<T> operator+(const c10::complex<T>& val) {
+  return val;
+}
+
+template<typename T>
+constexpr c10::complex<T> operator-(const c10::complex<T>& val) {
+  return c10::complex<T>(-val.real(), -val.imag());
+}
+
+template<typename T>
+constexpr c10::complex<T> operator+(const c10::complex<T>& lhs, const c10::complex<T>& rhs) {
+  c10::complex<T> result = lhs;
+  return result += rhs;
+}
+
+template<typename T>
+constexpr c10::complex<T> operator+(const c10::complex<T>& lhs, const T& rhs) {
+  c10::complex<T> result = lhs;
+  return result += rhs;
+}
+
+template<typename T>
+constexpr c10::complex<T> operator+(const T& lhs, const c10::complex<T>& rhs) {
+  c10::complex<T> result = rhs;
+  return result += lhs;
+}
+
+template<typename T>
+constexpr c10::complex<T> operator-(const c10::complex<T>& lhs, const c10::complex<T>& rhs) {
+  c10::complex<T> result = lhs;
+  return result -= rhs;
+}
+
+template<typename T>
+constexpr c10::complex<T> operator-(const c10::complex<T>& lhs, const T& rhs) {
+  c10::complex<T> result = lhs;
+  return result -= rhs;
+}
+
+template<typename T>
+constexpr c10::complex<T> operator-(const T& lhs, const c10::complex<T>& rhs) {
+  c10::complex<T> result = -rhs;
+  return result += lhs;
+}
+
+template<typename T>
+constexpr c10::complex<T> operator*(const c10::complex<T>& lhs, const c10::complex<T>& rhs) {
+  c10::complex<T> result = lhs;
+  return result *= rhs;
+}
+
+template<typename T>
+constexpr c10::complex<T> operator*(const c10::complex<T>& lhs, const T& rhs) {
+  c10::complex<T> result = lhs;
+  return result *= rhs;
+}
+
+template<typename T>
+constexpr c10::complex<T> operator*(const T& lhs, const c10::complex<T>& rhs) {
+  c10::complex<T> result = rhs;
+  return result *= lhs;
+}
+
+template<typename T>
+constexpr c10::complex<T> operator/(const c10::complex<T>& lhs, const c10::complex<T>& rhs) {
+  c10::complex<T> result = lhs;
+  return result /= rhs;
+}
+
+template<typename T>
+constexpr c10::complex<T> operator/(const c10::complex<T>& lhs, const T& rhs) {
+  c10::complex<T> result = lhs;
+  return result /= rhs;
+}
+
+template<typename T>
+constexpr c10::complex<T> operator/(const T& lhs, const c10::complex<T>& rhs) {
+  c10::complex<T> result(lhs, T());
+  return result /= rhs;
+}
+
+template<typename T>
+constexpr bool operator==(const c10::complex<T>& lhs, const c10::complex<T>& rhs) {
+  return (lhs.real() == rhs.real()) && (lhs.imag() == rhs.imag());
+}
+
+template<typename T>
+constexpr bool operator==(const c10::complex<T>& lhs, const T& rhs) {
+  return (lhs.real() == rhs) && (lhs.imag() == T());
+}
+
+template<typename T>
+constexpr bool operator==(const T& lhs, const c10::complex<T>& rhs) {
+  return (lhs == rhs.real()) && (T() == rhs.imag());
+}
+
+template<typename T>
+constexpr bool operator!=(const c10::complex<T>& lhs, const c10::complex<T>& rhs) {
+  return !(lhs == rhs);
+}
+
+template<typename T>
+constexpr bool operator!=(const c10::complex<T>& lhs, const T& rhs) {
+  return !(lhs == rhs);
+}
+
+template<typename T>
+constexpr bool operator!=(const T& lhs, const c10::complex<T>& rhs) {
+  return !(lhs == rhs);
+}
 
 #include <c10/util/complex_math.h>

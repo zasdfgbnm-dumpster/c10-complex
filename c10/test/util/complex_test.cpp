@@ -385,6 +385,39 @@ void test_arithmetic_assign() {
 
 } // namespace arithmetic_assign
 
+namespace arithmetic {
+
+template<typename scalar_t>
+void test_arithmetic_() {
+  static_assert(c10::complex<scalar_t>(1, 2) == +c10::complex<scalar_t>(1, 2), "");
+  static_assert(c10::complex<scalar_t>(-1, -2) == -c10::complex<scalar_t>(1, 2), "");
+
+  static_assert(c10::complex<scalar_t>(1, 2) + c10::complex<scalar_t>(3, 4) == c10::complex<scalar_t>(4, 6), "");
+  static_assert(c10::complex<scalar_t>(1, 2) + scalar_t(3) == c10::complex<scalar_t>(4, 2), "");
+  static_assert(scalar_t(3) + c10::complex<scalar_t>(1, 2)  == c10::complex<scalar_t>(4, 2), "");
+
+  static_assert(c10::complex<scalar_t>(1, 2) - c10::complex<scalar_t>(3, 4) == c10::complex<scalar_t>(-2, -2), "");
+  static_assert(c10::complex<scalar_t>(1, 2) - scalar_t(3) == c10::complex<scalar_t>(-2, 2), "");
+  static_assert(scalar_t(3) - c10::complex<scalar_t>(1, 2)  == c10::complex<scalar_t>(2, -2), "");
+
+  static_assert(c10::complex<scalar_t>(1, 2) * c10::complex<scalar_t>(3, 4) == c10::complex<scalar_t>(-5, 10), "");
+  static_assert(c10::complex<scalar_t>(1, 2) * scalar_t(3) == c10::complex<scalar_t>(3, 6), "");
+  static_assert(scalar_t(3) * c10::complex<scalar_t>(1, 2)  == c10::complex<scalar_t>(3, 6), "");
+
+  static_assert(c10::complex<scalar_t>(-5, 10) / c10::complex<scalar_t>(3, 4) == c10::complex<scalar_t>(1, 2), "");
+  static_assert(c10::complex<scalar_t>(5, 10) / scalar_t(5) == c10::complex<scalar_t>(1, 2), "");
+  static_assert(scalar_t(25) / c10::complex<scalar_t>(3, 4)  == c10::complex<scalar_t>(3, -4), "");
+}
+
+void test_arithmetic() {
+  test_arithmetic_<c10::Half>();
+  test_arithmetic_<float>();
+  test_arithmetic_<double>();
+}
+
+} // namespace arithmetic
+
+
 TEST(NonStaticTests, all) {
   constructors::test_thrust_conversion();
   assignment::test_assign_thrust();
