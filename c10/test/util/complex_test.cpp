@@ -461,11 +461,40 @@ void test_io() {
 
 } // namespace io
 
+namespace test_std_basic {
+
+template<typename scalar_t>
+C10_HOST_DEVICE void test_callable_() {
+  static_assert(std::real(c10::complex<scalar_t>(1, 2)) == scalar_t(1), "");
+  static_assert(std::imag(c10::complex<scalar_t>(1, 2)) == scalar_t(2), "");
+  std::abs(c10::complex<scalar_t>(1, 2));
+}
+
+MAYBE_GLOBAL void test_callable() {
+  test_callable_<c10::Half>();
+  test_callable_<float>();
+  test_callable_<double>();
+}
+
+template<typename scalar_t>
+void test_values_() {
+  ASSERT_EQ(std::abs(c10::complex<scalar_t>(3, 4)), scalar_t(5));
+}
+
+void test_values() {
+  test_values_<c10::Half>();
+  test_values_<float>();
+  test_values_<double>();
+}
+
+}
+
 
 TEST(NonStaticTests, all) {
   constructors::test_thrust_conversion();
   assignment::test_assign_thrust();
   io::test_io();
+  test_std_basic::test_values();
 }
 
 // main

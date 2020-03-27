@@ -419,4 +419,27 @@ std::basic_istream<CharT, Traits>& operator>>(std::basic_istream<CharT, Traits>&
   return is;
 }
 
+// std functions
+//
+// The implementation of these functions also follow the design of C++20
+
+namespace std {
+
+template< class T >
+constexpr T real(const c10::complex<T>& z) {
+  return z.real();
+}
+
+template< class T >
+constexpr T imag(const c10::complex<T>& z) {
+  return z.imag();
+}
+
+template< class T >
+C10_HOST_DEVICE T abs(const c10::complex<T>& z) {
+  return std::hypot(std::real(z), std::imag(z));
+}
+
+}  // namespace std
+
 #include <c10/util/complex_math.h>
